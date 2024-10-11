@@ -87,10 +87,10 @@ class BarmanCollector:
         self.collectors = dict(
             barman_backup_size=core.GaugeMetricFamily(
                 'barman_backup_size', "Size of available backups",
-                labels=['server', 'number']),
+                labels=['server', 'backup_id', 'date']),
             barman_backup_wal_size=core.GaugeMetricFamily(
                 'barman_backup_wal_size', "WAL size of available backups",
-                labels=['server', 'number']),
+                labels=['server', 'backup_id', 'date']),
             barman_backups_total=core.GaugeMetricFamily(
                 "barman_backups_total", "Total number of backups",
                 labels=["server"]),
@@ -171,12 +171,12 @@ class BarmanCollector:
     def collect_barman_backup_size(self, barman_server):
         for number, backup in enumerate(barman_server.backups_done, 1):
             self.collectors['barman_backup_size'].add_metric(
-                [barman_server.name, str(number)], backup['size_bytes'])
+                [barman_server.name, backup['backup_id'], str(backup['end_time_timestamp'])], backup['size_bytes'])
 
     def collect_barman_backup_wal_size(self, barman_server):
         for number, backup in enumerate(barman_server.backups_done, 1):
             self.collectors['barman_backup_wal_size'].add_metric(
-                [barman_server.name, str(number)], backup['wal_size_bytes'])
+                [barman_server.name, backup['backup_id'], str(backup['end_time_timestamp'])], backup['wal_size_bytes'])
 
     def collect_barman_up(self, barman_server):
         for check_name, check_value in barman_server.checks.items():
